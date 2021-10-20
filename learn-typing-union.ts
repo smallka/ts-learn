@@ -1,3 +1,5 @@
+import { DotDotDotToken } from "typescript"
+
 export {}
 console.log("------------------ learn-typing-union ------------------")
 
@@ -32,18 +34,35 @@ let mixed: CatOrDogOrBoth = {
 }
 console.log(mixed.name + " is CatOrDogOrBoth")
 // wrong console.log("    purrs = " + mixed.purrs)
+// 父类型强转子类型，慎用！
 console.log("    purrs = " + (mixed as Cat).purrs)
 console.log("    barks = " + (mixed as Dog).barks)
 
-// 父类型强转子类型，慎用！
 let animal: Animal = cat
 console.log(animal.name + " is Animal")
+// 父类型强转子类型，慎用！
 console.log("    purrs = " + (animal as Cat).purrs)
 console.log("    barks = " + (animal as Dog).barks)
 
 let mixedAnimal: Animal = mixed
 console.log(mixedAnimal.name + " is Animal")
+
 // wrong let animalMixed: CatOrDogOrBoth = animal
+console.log("animal is not CatOrDogOrBoth")
+
+type Both = Cat & Dog
+let both: Both = {
+    name: "both",
+    purrs: true,
+    barks: true,
+}
+console.log(both.name + " is Both")
+
+let bothMixed: CatOrDogOrBoth = both;
+console.log(bothMixed.name + " is CatOrDogOrBoth")
+
+// wrong let both: Both = mixed
+console.log("mixed is not Both")
 
 /* output
 cat is Cat
@@ -59,4 +78,8 @@ cat is Animal
     purrs = true
     barks = undefined
 mixed is Animal
+animal is not CatOrDogOrBoth
+both is Both
+both is CatOrDogOrBoth
+mixed is not Both
 */
