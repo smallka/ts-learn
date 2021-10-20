@@ -1,12 +1,5 @@
 export {}
 
-let a : 5 = 5
-console.log("a = " + typeof(a))
-const b = 5
-console.log("b = " + typeof(b))
-let c = 5
-console.log("c = " + typeof(c))
-
 type Opt = {
     name: string
     oldname?: string
