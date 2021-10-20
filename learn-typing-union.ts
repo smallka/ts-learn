@@ -64,6 +64,19 @@ console.log(bothMixed.name + " is CatOrDogOrBoth")
 // wrong let both: Both = mixed
 console.log("mixed is not Both")
 
+type Mouse = Animal & { squeak: boolean }
+type ThreeUnion = Cat | Dog | Mouse
+
+let mixedThree: ThreeUnion = mixed
+console.log(mixedThree.name + " is ThreeUnion")
+console.log("    purrs = " + (mixedThree as Cat).purrs)
+// wrong console.log("    squeak = " + (mixedThree as Mouse).squeak)
+
+let bothThree: ThreeUnion = both
+console.log(bothThree.name + " is ThreeUnion")
+// wrong console.log("    purrs = " + bothThree.purrs)
+console.log("    purrs = " + (bothThree as Cat).purrs)
+
 /* output
 cat is Cat
     purrs = true
@@ -82,4 +95,8 @@ animal is not CatOrDogOrBoth
 both is Both
 both is CatOrDogOrBoth
 mixed is not Both
+mixed is ThreeUnion
+    purrs = true
+both is ThreeUnion
+    purrs = true
 */
