@@ -1,4 +1,5 @@
 export {}
+console.log("------------------ learn-typing-object ------------------")
 
 type Opt = {
     name: string
@@ -30,10 +31,10 @@ let extraOpt = {
 f(extraOpt)
 
 
-/*
+/* wrong
 let wrongOpt: Opt = {
     name: "hello",
-    extta: "wrong",
+    wrong: "wrong",
 }
 f(opt)
 */
@@ -44,3 +45,11 @@ let extraOpt3 = {
 }
 let opt3 : Opt = extraOpt3
 f(opt3)
+
+/* output
+{ name: 'hello' }
+{ name: 'hello', oldname: 'oldname' }
+{ name: 'hello', extra: 'extra1' }
+{ name: 'hello', extra: 'extra2' }
+{ name: 'hello', extra: 'extra3' }
+*/
