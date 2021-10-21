@@ -31,7 +31,7 @@ let extraOpt = {
 f(extraOpt)
 
 
-/* wrong
+/* WRONG
 let wrongOpt: Opt = {
     name: "hello",
     wrong: "wrong",
