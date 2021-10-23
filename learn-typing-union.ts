@@ -1,6 +1,3 @@
-import { type } from "os"
-import { DotDotDotToken } from "typescript"
-
 export {}
 console.log("------------------ learn-typing-union ------------------")
 
