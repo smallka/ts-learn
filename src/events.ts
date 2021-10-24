@@ -1,8 +1,4 @@
-interface EventsMap {
-    [event: string]: any
-}
-
-export class Emitter<Events extends EventsMap > {
+export class Emitter<Events extends Record<string, any>> {
     events: { [E in keyof Events]?: Events[E][] } = {};
 
     on<K extends keyof Events>(this: this, event: K, cb: Events[K]): Events[K]
@@ -34,7 +30,7 @@ export class Emitter<Events extends EventsMap > {
 }
 
 export function createEvents<
-    Events extends EventsMap
+    Events extends Record<string, any>
     >(): Emitter<Events>
 {
     return new Emitter<Events>();
