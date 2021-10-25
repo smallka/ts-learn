@@ -23,6 +23,8 @@ emitter.emit('set', 'prop', 3)
 
 emitter.off('set', handler)
 
+emitter.on('set', (count)=>{console.log(`sad recv only count = ${count}`)})
+
 emitter.emit('set', 'prop', 4)
 
 emitter.emit('tick')
@@ -32,4 +34,5 @@ alice recv count = 2
 alice recv count = 3
 bob recv count = 3
 bob recv count = 4
+sad recv only count = prop
 */

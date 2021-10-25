@@ -11,6 +11,7 @@ type Events = {
   
 const emitter = mitt<Events>();
 
+emitter.on('foo', () => console.log("foo without argument"));
 emitter.on('foo', (msg) => console.log("foo " + msg.toUpperCase()));
 emitter.emit('foo', 'hello');
 
