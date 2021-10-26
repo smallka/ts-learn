@@ -16,11 +16,16 @@ class PhysicsSystem
     {
         this.ecs = ecs_
         ecs.on('update', this.update.bind(this))
+        ecs.onEntityEvent('onDamage', ['player'], this.onDamage)
     }
 
     update(this: this, dt: number): void
     {
         console.log(`${this.ecs.name} call physics: update ${dt}`)
+    }
+    onDamage(this: this, entity: Entity, damage: number): void
+    {
+        console.log(`on damage, entity=${entity.tags}, damage=${damage}`)
     }
 }
 
@@ -48,25 +53,66 @@ class AOISystem
     }
 }
 
+type Tags = 'player' | 'npc' | 'item'
+class Entity
+{
+    tags: Set<Tags> = new Set()
+    constructor(tags_: Tags[])
+    {
+        tags_.forEach((tag) => this.tags.add(tag))
+    }
+}
+
+type EntityEvents = {
+    onDamage: number,
+    onDie: EntityInfo,
+}
+
+type EntityEventsWrapper = {
+    [K in keyof EntityEvents]: { entity: Entity, argument: EntityEvents[K] }
+}
+type EntityEventHandler<T = unknown> = (entity: Entity, argument: T) => void;
+
 class ECS
 {
     name: string
-    emitter: Emitter<SystemEvents>
+    systemEmitter: Emitter<SystemEvents>
+    entityEmitter: Emitter<EntityEventsWrapper>
 
     constructor(givenName: string)
     {
         this.name = givenName
-        this.emitter = createEvents<SystemEvents>()
+        this.systemEmitter = createEvents<SystemEvents>()
+        this.entityEmitter = createEvents<EntityEventsWrapper>()
     }
 
-    on<K extends keyof SystemEvents>(this: this, eventType: K, handler: EventHandler<SystemEvents[K]>)
+    on<K extends keyof SystemEvents>(this: this, event: K, handler: EventHandler<SystemEvents[K]>)
     {
-        return this.emitter.on(eventType, handler)
+        return this.systemEmitter.on(event, handler)
     }
 
-    emit<K extends keyof SystemEvents>(this: this, eventType: K, event: SystemEvents[K]): void
+    emit<K extends keyof SystemEvents>(this: this, event: K, argument: SystemEvents[K]): void
     {
-        this.emitter.emit(eventType, event)
+        this.systemEmitter.emit(event, argument)
+    }
+
+    onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[], handler: EntityEventHandler<EntityEvents[K]>)
+    {
+        return this.entityEmitter.on(event, function(argumentWrapper: EntityEventsWrapper[K]) {
+            let entity = argumentWrapper.entity
+            let match = true
+            tags.forEach((tag) => { match = match && entity.tags.has(tag) })
+            if (match)
+            {
+                handler(entity, argumentWrapper.argument as EntityEvents[K])
+            }
+        })
+    }
+
+    emitEntityEvent<K extends keyof EntityEvents>(this: this, event: K, entity: Entity, argument: EntityEvents[K]): void
+    {
+        let argumentWrapper: EntityEventsWrapper[K] = { entity: entity, argument: argument } as EntityEventsWrapper[K]
+        this.entityEmitter.emit(event, argumentWrapper)
     }
 }
 
@@ -76,6 +122,15 @@ new AOISystem(ecs, 2.5)
 
 ecs.emit('update', 101)
 
-ecs.emit('onAddEntity', {name: 'alice', typeId: 1001})
+let info: EntityInfo = {name: 'alice', typeId: 1001}
+ecs.emit('onAddEntity', info)
 
-console.log(ecs.emitter.events)
+console.log(ecs.systemEmitter.events)
+
+let entSam = new Entity(['player'])
+ecs.emitEntityEvent('onDamage', entSam, 102)
+
+let entDog = new Entity(['npc'])
+ecs.emitEntityEvent('onDamage', entDog, 103)
+
+console.log(ecs.entityEmitter.events)
