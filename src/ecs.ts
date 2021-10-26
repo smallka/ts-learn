@@ -40,9 +40,10 @@ class AOISystem
         console.log(`${this.ecs.name} call AOI: update ${dt} radius=${this.radius}`)
     }
 
-    onAddEntity(this: this, entity: string): void
+    onAddEntity(this: this, entity: string): number
     {
         console.log(`${this.ecs.name} call AOI: onAddEntity ${entity}`)
+        return 2
     }
 }
 
