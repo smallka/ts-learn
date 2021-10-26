@@ -1,7 +1,7 @@
 export {}
 console.log('------------------ learn-ecs2 ------------------')
 
-import {createEvents, Emitter, Handler} from './events2';
+import {createEvents, Emitter, EventHandler} from './events2';
 
 type EntityInfo = {name: string, typeId: number}
 type SystemEvents = {
@@ -15,7 +15,7 @@ class PhysicsSystem
     constructor(ecs_: ECS)
     {
         this.ecs = ecs_
-        ecs.emitter.on('update', this.update.bind(this))
+        ecs.on('update', this.update.bind(this))
     }
 
     update(this: this, dt: number): void
@@ -32,8 +32,8 @@ class AOISystem
     {
         this.ecs = ecs_
         this.radius = radius_
-        ecs.emitter.on('update', this.update.bind(this))
-        ecs.emitter.on('onAddEntity', this.onAddEntity.bind(this))
+        ecs.on('update', this.update.bind(this))
+        ecs.on('onAddEntity', this.onAddEntity.bind(this))
     }
 
     update(this: this, dt: number): void
@@ -59,9 +59,9 @@ class ECS
         this.emitter = createEvents<SystemEvents>()
     }
 
-    registerEvent<K extends keyof SystemEvents>(this: this, eventType: K, handler: Handler<SystemEvents[K]>): void
+    on<K extends keyof SystemEvents>(this: this, eventType: K, handler: EventHandler<SystemEvents[K]>)
     {
-        this.emitter.on(eventType, handler)
+        return this.emitter.on(eventType, handler)
     }
 
     emit<K extends keyof SystemEvents>(this: this, eventType: K, event: SystemEvents[K]): void

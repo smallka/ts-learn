@@ -1,16 +1,16 @@
-export type Handler<T = unknown> = (argument: T) => void;
+export type EventHandler<T = unknown> = (argument: T) => void;
 
 export class Emitter<Events extends Record<string, any>> {
-    events: { [E in keyof Events]?: Handler<Events[E]>[] } = {};
+    events: { [E in keyof Events]?: EventHandler<Events[E]>[] } = {};
 
-    on<K extends keyof Events>(this: this, event: K, cb: Handler<Events[K]>): Handler<Events[K]>
+    on<K extends keyof Events>(this: this, event: K, cb: EventHandler<Events[K]>): EventHandler<Events[K]>
     {
         this.events[event] = this.events[event] || [];
         this.events[event]!.push(cb);
         return cb;
     }
     
-    off<K extends keyof Events>(this: this, event: K, cb: Handler<Events[K]>): void
+    off<K extends keyof Events>(this: this, event: K, cb: EventHandler<Events[K]>): void
     {
         let events = this.events[event];
         if (events)
