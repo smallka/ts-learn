@@ -51,7 +51,6 @@ class ECS
 {
     name: string
     emitter: Emitter<SystemEvents>
-    private systems: SystemEvents[] = []
 
     constructor(givenName: string)
     {
