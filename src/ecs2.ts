@@ -1,7 +1,7 @@
 export {}
 console.log('------------------ learn-ecs2 ------------------')
 
-import mitt, {Emitter, Handler} from './events2';
+import {createEvents, Emitter, Handler} from './events2';
 
 type EntityInfo = {name: string, typeId: number}
 type SystemEvents = {
@@ -56,12 +56,17 @@ class ECS
     constructor(givenName: string)
     {
         this.name = givenName
-        this.emitter = mitt<SystemEvents>()
+        this.emitter = createEvents<SystemEvents>()
     }
 
-    registerEvent<K extends keyof SystemEvents>(this: this, event: K, handler: Handler<SystemEvents[K]>): void
+    registerEvent<K extends keyof SystemEvents>(this: this, eventType: K, handler: Handler<SystemEvents[K]>): void
     {
-        this.emitter.on(event, handler)
+        this.emitter.on(eventType, handler)
+    }
+
+    emit<K extends keyof SystemEvents>(this: this, eventType: K, event: SystemEvents[K]): void
+    {
+        this.emitter.emit(eventType, event)
     }
 }
 
@@ -69,8 +74,8 @@ let ecs = new ECS('ecs')
 new PhysicsSystem(ecs)
 new AOISystem(ecs, 2.5)
 
-ecs.emitter.emit('update', 101)
+ecs.emit('update', 101)
 
-ecs.emitter.emit('onAddEntity', {name: 'alice', typeId: 1001})
+ecs.emit('onAddEntity', {name: 'alice', typeId: 1001})
 
-console.log(ecs.emitter.all)
+console.log(ecs.emitter.events)

@@ -23,7 +23,7 @@ emitter.emit('set', 'prop', 3)
 
 emitter.off('set', handler)
 
-emitter.on('set', (count)=>{console.log(`sad recv only count = ${count}`)})
+emitter.on('set', (count: string)=>{console.log(`sad recv name as count = ${count}`)})
 
 emitter.emit('set', 'prop', 4)
 

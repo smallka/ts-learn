@@ -1,17 +1,17 @@
 export {}
 console.log("------------------ learn-events2 ------------------")
 
-import mitt from "./events2";
+import {createEvents} from "./events2";
 
 
 type Events = {
     set: {name: string, count: number},
     tick: number,
     tupl: [number, string],
-    bar?: number,
+    bar: null,
 }
 
-const emitter = mitt<Events>()
+const emitter = createEvents<Events>()
 
 
 emitter.on('set', (event)=>{console.log(`alice recv object, count = ${event.count}`)})
@@ -38,9 +38,9 @@ emitter.emit('tick', 3.14)
 emitter.off('tick', onTick)
 emitter.emit('tick', 6.28)
 
-emitter.on('bar', (val)=>{console.log(`mike recv bar, count = ${val}`)})
-emitter.emit('bar', 6.28)
-emitter.emit('bar')
+emitter.on('bar', (val)=>{console.log(`mike recv bar val=${val}`)})
+emitter.emit('bar', null)
+// WRONG emitter.emit('bar')
 
 /* output
 alice recv object, count = 1
