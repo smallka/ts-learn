@@ -6,5 +6,8 @@ import "./learn-events"
 import "./learn-events2"
 import "./ecs"
 import "./ecs2"
+import "./learn-entity"
 
 console.log("done.")
+
+
