@@ -8,16 +8,3 @@ import "./ecs"
 import "./ecs2"
 
 console.log("done.")
-
-type Event = {
-    a: number,
-    b: string,
-}
-type Handler = {
-    [K in keyof Event]: (event: Event[K]) => void
-}
-type M = Handler[keyof Event]
-
-let m: M = function(event: string) {
-    
-}
