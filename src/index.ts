@@ -4,9 +4,9 @@ import "./learn-typing-function"
 import "./learn-mitt"
 import "./learn-events"
 import "./learn-events2"
-import "./ecs"
-import "./ecs2"
-import "./learn-entity"
+import "./try-ecs"
+import "./try-ecs2"
+import "./try-entity"
 
 console.log("done.")
 
