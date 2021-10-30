@@ -16,7 +16,7 @@ class PhysicsSystem
     {
         this.ecs = ecs_
         ecs.on('update', this.update.bind(this))
-        ecs.onEntityEvent('onDamage', ['player'], this.onDamage)
+        ecs.onEntityEvent('onDamage', 'player', this.onDamage)
     }
 
     update(this: this, dt: number): void
@@ -96,11 +96,17 @@ class ECS
         this.systemEmitter.emit(event, argument)
     }
 
-    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[], handler: EntityEventHandler<EntityEvents[K]>)
+    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Tags, handler: EntityEventHandler<EntityEvents[K]>)
     {
         return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[K]) => {
             let entity = argumentWrapper.entity
             let match = true
+
+            if (!(tags instanceof Array))
+            {
+                tags = [tags]
+            }
+
             tags.forEach((tag) => { match = match && entity.tags.has(tag) })
             if (match)
             {
