@@ -96,18 +96,28 @@ class ECS
         this.systemEmitter.emit(event, argument)
     }
 
-    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Tags, handler: EntityEventHandler<EntityEvents[K]>)
+    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
     {
         return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[K]) => {
             let entity = argumentWrapper.entity
             let match = true
 
-            if (!(tags instanceof Array))
+            if (tags instanceof Function)
             {
-                tags = [tags]
+                if (!tags(entity.tags))
+                {
+                    return
+                }
+            }
+            else
+            {
+                if (!(tags instanceof Array))
+                {
+                    tags = [tags]
+                }
+                tags.forEach((tag) => { match = match && entity.tags.has(tag) })
             }
 
-            tags.forEach((tag) => { match = match && entity.tags.has(tag) })
             if (match)
             {
                 // 这个as是安全的，但是去不掉
