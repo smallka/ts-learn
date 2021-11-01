@@ -69,7 +69,7 @@ console.log(`test headEntity, ${testCom(headEntity, lowerComps)}`)
 console.log(`test legEntity, ${testCom(legEntity, lowerComps)}`)
 console.log(`test lowerEntity, ${testCom(lowerEntity, lowerComps)}`)
 
-function genView<T extends ReadonlyArray<keyof Entity>>(entity: Entity, coms: T): EntityView<typeof coms[number]> | null
+function genView(entity: Entity, coms: ReadonlyArray<keyof Entity>): EntityView<typeof coms[number]> | null
 {
     for (const idx in coms)
     {
