@@ -96,21 +96,23 @@ class ECS
         this.systemEmitter.emit(event, argument)
     }
 
-    onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[], handler: EntityEventHandler<EntityEvents[K]>)
+    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[], handler: EntityEventHandler<EntityEvents[K]>)
     {
-        return this.entityEmitter.on(event, function(argumentWrapper: EntityEventsWrapper[K]) {
+        return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[K]) => {
             let entity = argumentWrapper.entity
             let match = true
             tags.forEach((tag) => { match = match && entity.tags.has(tag) })
             if (match)
             {
+                // 这个as是安全的，但是去不掉
                 handler(entity, argumentWrapper.argument as EntityEvents[K])
             }
         })
     }
 
-    emitEntityEvent<K extends keyof EntityEvents>(this: this, event: K, entity: Entity, argument: EntityEvents[K]): void
+    public emitEntityEvent<K extends keyof EntityEvents>(this: this, event: K, entity: Entity, argument: EntityEvents[K]): void
     {
+        // 这个as是安全的，但是去不掉
         let argumentWrapper: EntityEventsWrapper[K] = { entity: entity, argument: argument } as EntityEventsWrapper[K]
         this.entityEmitter.emit(event, argumentWrapper)
     }
@@ -132,5 +134,7 @@ ecs.emitEntityEvent('onDamage', entSam, 102)
 
 let entDog = new Entity(['npc'])
 ecs.emitEntityEvent('onDamage', entDog, 103)
+
+ecs.emitEntityEvent('onDie', entDog, info)
 
 console.log(ecs.entityEmitter.events)
