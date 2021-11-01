@@ -16,7 +16,6 @@ interface EntityEvents {
 type EntityEventsWrapper = {
     [K in keyof EntityEvents]: { entity: Entity, argument: EntityEvents[K] }
 }
-type EntityEventHandler<T = unknown> = (entity: Entity, argument: T) => void;
 
 function isEntityInView(entity: Entity, coms: ReadonlyArray<keyof Entity>)
 {
