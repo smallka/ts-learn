@@ -8,6 +8,8 @@ import "./try-ecs"
 import "./try-ecs2"
 import "./try-entity"
 
+import "./test-ecs"
+
 console.log("done.")
 
 

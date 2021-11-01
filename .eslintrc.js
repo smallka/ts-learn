@@ -19,5 +19,6 @@ module.exports = {
     },
     rules: {
       // 自定义你的规则
+      "max-params": ["error", 5]
     },
   };
