@@ -2,17 +2,7 @@
 import {createEvents, Emitter, EventHandler} from '../events2';
 import {EntityTag, Entity, EntityView} from './entity';
 import {System} from './system';
-
-interface SystemEvents {
-    onGameplayStart: null,
-    onGameplayEnd: boolean,
-}
-
-interface EntityEvents {
-    onAddItem: Entity,
-    onMoveStop: boolean,
-    tickEntity: number,
-}
+import {SystemEvents, EntityEvents} from './event-def'
 
 type EntityEventsWrapper = {
     [K in keyof EntityEvents]: { entity: Entity, argument: EntityEvents[K] }
