@@ -96,7 +96,7 @@ class ECS
         this.systemEmitter.emit(event, argument)
     }
 
-    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
+    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
     {
         return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[K]) => {
             let entity = argumentWrapper.entity
@@ -111,7 +111,8 @@ class ECS
             }
             else
             {
-                if (!(tags instanceof Array))
+                // 这里能不能正向判断是Tags？
+                if (!(tags instanceof Array) && !(tags instanceof Set))
                 {
                     tags = [tags]
                 }
