@@ -4,19 +4,41 @@ console.log('------------------ learn-ecs2 ------------------')
 import {createEvents, Emitter, EventHandler} from './ecs/events';
 
 type EntityInfo = {name: string, typeId: number}
+
 type SystemEvents = {
     update: number,
     onAddEntity: EntityInfo,
 }
 
-class PhysicsSystem
+class BaseSystem
 {
-    private ecs: ECS
+    protected ecs: ECS
+
     constructor(ecs_: ECS)
     {
         this.ecs = ecs_
-        ecs.on('update', this.update.bind(this))
-        ecs.onEntityEvent('onDamage', 'player', this.onDamage)
+    }
+
+    protected registerEvent<K extends keyof SystemEvents>(this: this, event: K, func: Function)
+    {
+        ecs.on(event, func.bind(this))
+    }
+
+    protected registerEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
+    {
+        ecs.onEntityEvent(event, tags, handler)        
+    }
+}
+
+class PhysicsSystem extends BaseSystem
+{
+    constructor(ecs_: ECS)
+    {
+        super(ecs_)
+        this.registerEvent('update', this.update)
+        this.registerEntityEvent('onDamage', 'player', this.onDamage)
+        // ecs.on('update', this.update.bind(this))
+        // ecs.onEntityEvent('onDamage', 'player', this.onDamage)
     }
 
     update(this: this, dt: number): void
@@ -29,16 +51,17 @@ class PhysicsSystem
     }
 }
 
-class AOISystem
+class AOISystem extends BaseSystem
 {
-    private ecs: ECS
     private radius: number
     constructor(ecs_: ECS, radius_: number)
     {
-        this.ecs = ecs_
+        super(ecs_)
         this.radius = radius_
-        ecs.on('update', this.update.bind(this))
-        ecs.on('onAddEntity', this.onAddEntity.bind(this))
+        this.registerEvent('update', this.update)
+        this.registerEvent('onAddEntity', this.onAddEntity)
+        // ecs.on('update', this.update.bind(this))
+        // ecs.on('onAddEntity', this.onAddEntity.bind(this))
     }
 
     update(this: this, dt: number): void
