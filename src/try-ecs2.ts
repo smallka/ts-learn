@@ -10,6 +10,8 @@ type SystemEvents = {
     onAddEntity: EntityInfo,
 }
 
+type SystemEventHandler<S=unknown, T = unknown> = (this: S, argument: T) => void;
+
 class BaseSystem
 {
     protected ecs: ECS
@@ -19,7 +21,7 @@ class BaseSystem
         this.ecs = ecs_
     }
 
-    protected registerEvent<K extends keyof SystemEvents>(this: this, event: K, func: Function)
+    protected registerEvent<K extends keyof SystemEvents>(this: this, event: K, func: SystemEventHandler<typeof this, SystemEvents[K]>)
     {
         ecs.on(event, func.bind(this))
     }
@@ -37,8 +39,6 @@ class PhysicsSystem extends BaseSystem
         super(ecs_)
         this.registerEvent('update', this.update)
         this.registerEntityEvent('onDamage', 'player', this.onDamage)
-        // ecs.on('update', this.update.bind(this))
-        // ecs.onEntityEvent('onDamage', 'player', this.onDamage)
     }
 
     update(this: this, dt: number): void
@@ -60,8 +60,6 @@ class AOISystem extends BaseSystem
         this.radius = radius_
         this.registerEvent('update', this.update)
         this.registerEvent('onAddEntity', this.onAddEntity)
-        // ecs.on('update', this.update.bind(this))
-        // ecs.on('onAddEntity', this.onAddEntity.bind(this))
     }
 
     update(this: this, dt: number): void
