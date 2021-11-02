@@ -1,23 +1,35 @@
 import {ComponentTransform, ComponentBag} from './component';
 
-export type Tags = 'player' | 'npc' | 'item' | 'movable'
+export type EntityTag = 'player' | 'npc' | 'item' | 'movable'
 export class Entity
 {
     public gocTransform?: ComponentTransform
     public gocBag?: ComponentBag
 
     protected readonly guid: number
-    protected tags: Set<Tags> = new Set()
+    protected tags: Set<EntityTag> = new Set()
 
-    public constructor(guid: number, tags: Tags[] = [])
+    public constructor(guid: number, tags: EntityTag[] = [])
     {
         this.guid = guid
         tags.forEach((tag) => this.tags.add(tag))
     }
 
-    public hasTag(tag: Tags)
+    public hasTag(tag: EntityTag)
     {
         return this.tags.has(tag)
+    }
+
+    public hasAllTags(tags: EntityTag[])
+    {
+        for (const tag of tags)
+        {
+            if (!this.tags.has(tag))
+            {
+                return false
+            }
+        }
+        return true
     }
 
     public getGUID()

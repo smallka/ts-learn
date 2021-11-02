@@ -1,4 +1,4 @@
-import {Tags, Entity} from './entity';
+import {Entity} from './entity';
 
 abstract class Component
 {

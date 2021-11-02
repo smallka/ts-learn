@@ -1,6 +1,6 @@
 
 import {createEvents, Emitter, EventHandler} from '../events2';
-import {Tags, Entity, EntityView} from './entity';
+import {EntityTag, Entity, EntityView} from './entity';
 import {System} from './system';
 
 interface SystemEvents {
@@ -31,8 +31,9 @@ function isEntityInView(entity: Entity, coms: ReadonlyArray<keyof Entity>)
 }
 
 interface TickEntityView {
-    entities: Entity[]
+    entities: Map<number, Entity>
     components: ReadonlyArray<keyof Entity>
+    tags: EntityTag[]
     handler: (deltaTime: number, entity: Entity) => void
 }
 
@@ -61,9 +62,9 @@ export class ECS
         this.entities.set(entity.getGUID(), entity)
         for (let view of this.tickEntityViews)
         {
-            if (isEntityInView(entity, view.components))
+            if (isEntityInView(entity, view.components) && entity.hasAllTags(view.tags))
             {
-                view.entities.push(entity)
+                view.entities.set(entity.getGUID(), entity)
             }
         }
     }
@@ -80,7 +81,7 @@ export class ECS
 
         for (let view of this.tickEntityViews)
         {
-            for (let entity of view.entities)
+            for (let [guid, entity] of view.entities)
             {
                 view.handler(deltaTime, entity)
             }
@@ -89,11 +90,13 @@ export class ECS
 
     public onTickEntity(
         handler: (deltaTime: number, entity: EntityView<typeof components[number]>) => void,
-        components: ReadonlyArray<keyof Entity>)
+        components: ReadonlyArray<keyof Entity>,
+        tags: EntityTag[] = [])
     {
         this.tickEntityViews.push({
-            entities: [],
+            entities: new Map,
             components: components,
+            tags: tags,
             handler: (deltaTime, entity) => handler(deltaTime, entity as EntityView<typeof components[number]>),
         })
     }
@@ -113,7 +116,7 @@ export class ECS
         event: E,
         handler: (entity: EntityView<typeof components[number]>, argument: EntityEvents[E]) => void,
         components: ReadonlyArray<keyof Entity> = [],
-        tags: Tags[] = [])
+        tags: EntityTag[] = [])
     {
         return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[E]) => {
             const entity = argumentWrapper.entity
@@ -121,9 +124,7 @@ export class ECS
             {
                 return
             }
-            let match = true
-            tags.forEach((tag) => { match = match && entity.hasTag(tag) })
-            if (match)
+            if (entity.hasAllTags(tags))
             {
                 handler(entity as EntityView<typeof components[number]>, argumentWrapper.argument as EntityEvents[E])
             }

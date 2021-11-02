@@ -1,4 +1,4 @@
-import {Tags, Entity, EntityView } from './entity';
+import {Entity, EntityView } from './entity';
 import {ECS} from './ecs';
 
 export interface System
@@ -50,7 +50,7 @@ export class MovementSystem extends System
         ecs.onSystemEvent('onGameplayStart', this.onGameplayStart.bind(this))
         ecs.onSystemEvent('onGameplayEnd', this.onGameplayEnd.bind(this))
         ecs.onEntityEvent('onMoveStop', this.onMoveStop.bind(this), MovementSystem.components, ['movable'])
-        ecs.onTickEntity(this.tickEntity.bind(this), MovementSystem.components)
+        ecs.onTickEntity(this.tickEntity.bind(this), MovementSystem.components, ['npc'])
     }
 
     public tick = (deltaTime: number) =>
