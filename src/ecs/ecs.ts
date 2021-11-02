@@ -1,5 +1,5 @@
 
-import {createEvents, Emitter, EventHandler} from '../events2';
+import {createEvents, Emitter, EventHandler} from './events';
 import {EntityTag, Entity, EntityView} from './entity';
 import {System} from './system';
 import {SystemEvents, EntityEvents} from './event-def'

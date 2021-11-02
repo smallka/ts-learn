@@ -1,7 +1,7 @@
 export {}
 console.log('------------------ learn-ecs2 ------------------')
 
-import {createEvents, Emitter, EventHandler} from './events2';
+import {createEvents, Emitter, EventHandler} from './ecs/events';
 
 type EntityInfo = {name: string, typeId: number}
 type SystemEvents = {
@@ -127,8 +127,6 @@ ecs.emit('update', 101)
 let info: EntityInfo = {name: 'alice', typeId: 1001}
 ecs.emit('onAddEntity', info)
 
-console.log(ecs.systemEmitter.events)
-
 let entSam = new Entity(['player'])
 ecs.emitEntityEvent('onDamage', entSam, 102)
 
@@ -136,5 +134,3 @@ let entDog = new Entity(['npc'])
 ecs.emitEntityEvent('onDamage', entDog, 103)
 
 ecs.emitEntityEvent('onDie', entDog, info)
-
-console.log(ecs.entityEmitter.events)

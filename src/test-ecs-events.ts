@@ -1,7 +1,7 @@
 export {}
-console.log("------------------ learn-events2 ------------------")
+console.log("------------------ test-ecs-events ------------------")
 
-import {createEvents} from "./events2";
+import {createEvents} from "./ecs/events";
 
 
 type Events = {
