@@ -1,35 +1,80 @@
 import {Tags, Entity, EntityView } from './entity';
 import {ECS} from './ecs';
 
+export interface System
+{
+    tick?: (deltaTime: number) => void
+}
+
 export abstract class System 
 {
-    protected ecs: ECS
+    protected readonly ecs: ECS
     public constructor(ecs: ECS)
     {
         this.ecs = ecs
     }
 }
 
-const components = [ 'gocTransform', 'gocBag' ] as const
-
-export class MovementSystem extends System
+export class BagSystem extends System
 {
+    private static readonly components = [ 'gocBag' ] as const
     public constructor(ecs: ECS)
     {
         super(ecs)
 
         ecs.onSystemEvent('onGameplayStart', this.onGameplayStart.bind(this))
-        ecs.onEntityEvent('onAddItem', components, ['movable'], this.onAddItem.bind(this))
+        ecs.onEntityEvent('onAddItem', this.onAddItem.bind(this), BagSystem.components)
     }
 
     private onGameplayStart(this: this)
     {
-        console.log(`Movemvent onGameplayStart`)
+        console.log(`BagSystem onGameplayStart`)
     }
 
-    private onAddItem(this: this, entity: EntityView<typeof components[number]>, item: Entity)
+    private onAddItem(this: this, entity: EntityView<typeof BagSystem.components[number]>, item: Entity)
     {
-        console.log(`Movemvent onAddItem, item=${item.getGUID()}, entity=`)
-        console.log(entity)
+        console.log(`BagSystem onAddItem, item=${item.getGUID()}, entity=${entity.getGUID()}`)
+    }
+}
+
+export class MovementSystem extends System
+{
+    private static readonly components = [ 'gocTransform' ] as const
+    private speed: number
+
+    public constructor(ecs: ECS, speed: number)
+    {
+        super(ecs)
+        this.speed = speed
+
+        ecs.onSystemEvent('onGameplayStart', this.onGameplayStart.bind(this))
+        ecs.onSystemEvent('onGameplayEnd', this.onGameplayEnd.bind(this))
+        ecs.onEntityEvent('onMoveStop', this.onMoveStop.bind(this), MovementSystem.components, ['movable'])
+        ecs.onTickEntity(this.tickEntity.bind(this), MovementSystem.components)
+    }
+
+    public tick = (deltaTime: number) =>
+    {
+        console.log(`MovementSystem tick, deltaTime=${deltaTime}, speed=${this.speed}`)
+    }
+
+    public tickEntity(this: this, deltaTime: number, entity: EntityView<typeof MovementSystem.components[number]>)
+    {
+        console.log(`MovementSystem tickEntity, deltaTime=${deltaTime}, entity=${entity.getGUID()}`)
+    }
+
+    private onGameplayStart(this: this)
+    {
+        console.log(`MovementSystem onGameplayStart`)
+    }
+
+    private onGameplayEnd(this: this)
+    {
+        console.log(`MovementSystem onGameplaEnd`)
+    }
+
+    private onMoveStop(this: this, entity: EntityView<typeof MovementSystem.components[number]>, isImme: boolean)
+    {
+        console.log(`MovementSystem onMoveStop, isImme=${isImme}, entity=${entity.getGUID()}`)
     }
 }

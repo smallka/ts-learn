@@ -6,7 +6,7 @@ export class Entity
     public gocTransform?: ComponentTransform
     public gocBag?: ComponentBag
 
-    protected guid: number
+    protected readonly guid: number
     protected tags: Set<Tags> = new Set()
 
     public constructor(guid: number, tags: Tags[] = [])

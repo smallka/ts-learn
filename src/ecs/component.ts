@@ -2,7 +2,7 @@ import {Tags, Entity} from './entity';
 
 abstract class Component
 {
-    protected owner: Entity
+    protected readonly owner: Entity
     public constructor(owner: Entity)
     {
         this.owner = owner
