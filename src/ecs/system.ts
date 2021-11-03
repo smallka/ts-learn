@@ -26,12 +26,12 @@ export class BagSystem extends System
         ecs.onEntityEvent('onAddItem', this.onAddItem.bind(this), BagSystem.components)
     }
 
-    private onGameplayStart(this: this)
+    private onGameplayStart()
     {
         console.log(`BagSystem onGameplayStart`)
     }
 
-    private onAddItem(this: this, entity: EntityView<typeof BagSystem.components[number]>, item: Entity)
+    private onAddItem(entity: EntityView<typeof BagSystem.components[number]>, item: Entity)
     {
         console.log(`BagSystem onAddItem, item=${item.guid}, entity=${entity.guid}`)
     }
@@ -58,22 +58,22 @@ export class MovementSystem extends System
         console.log(`MovementSystem tick, deltaTime=${deltaTime}, speed=${this.speed}`)
     }
 
-    public tickEntity(this: this, deltaTime: number, entity: EntityView<typeof MovementSystem.components[number]>)
+    public tickEntity(deltaTime: number, entity: EntityView<typeof MovementSystem.components[number]>)
     {
         console.log(`MovementSystem tickEntity, deltaTime=${deltaTime}, entity=${entity.guid}`)
     }
 
-    private onGameplayStart(this: this)
+    private onGameplayStart()
     {
         console.log(`MovementSystem onGameplayStart`)
     }
 
-    private onGameplayEnd(this: this)
+    private onGameplayEnd()
     {
         console.log(`MovementSystem onGameplaEnd`)
     }
 
-    private onMoveStop(this: this, entity: EntityView<typeof MovementSystem.components[number]>, isImme: boolean)
+    private onMoveStop(entity: EntityView<typeof MovementSystem.components[number]>, isImme: boolean)
     {
         console.log(`MovementSystem onMoveStop, isImme=${isImme}, entity=${entity.guid}`)
     }

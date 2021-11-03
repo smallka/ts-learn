@@ -42,12 +42,12 @@ export class ECS
         this.entityEmitter = createEvents<EntityEventsWrapper>()
     }
 
-    public addSystem(this: this, system: System)
+    public addSystem(system: System)
     {
         this.systems.push(system)
     }
 
-    public addEntity(this: this, entity: Entity)
+    public addEntity(entity: Entity)
     {
         this.entities.set(entity.guid, entity)
         for (let view of this.tickEntityViews)
@@ -59,7 +59,7 @@ export class ECS
         }
     }
 
-    public tick(this: this, deltaTime: number)
+    public tick(deltaTime: number)
     {
         for (let system of this.systems)
         {
@@ -91,18 +91,17 @@ export class ECS
         })
     }
 
-    public onSystemEvent<K extends keyof SystemEvents>(this: this, event: K, handler: EventHandler<SystemEvents[K]>)
+    public onSystemEvent<K extends keyof SystemEvents>(event: K, handler: EventHandler<SystemEvents[K]>)
     {
         return this.systemEmitter.on(event, handler)
     }
 
-    public emitSystemEvent<K extends keyof SystemEvents>(this: this, event: K, argument: SystemEvents[K]): void
+    public emitSystemEvent<K extends keyof SystemEvents>(event: K, argument: SystemEvents[K]): void
     {
         this.systemEmitter.emit(event, argument)
     }
 
     public onEntityEvent<E extends keyof EntityEvents>(
-        this: this,
         event: E,
         handler: (entity: EntityView<typeof components[number]>, argument: EntityEvents[E]) => void,
         components: ReadonlyArray<keyof Entity> = [],
@@ -122,7 +121,6 @@ export class ECS
     }
 
     public emitEntityEvent<E extends keyof EntityEvents>(
-        this: this,
         event: E,
         entity: Entity,
         argument: EntityEvents[E])
