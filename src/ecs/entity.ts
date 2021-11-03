@@ -6,7 +6,7 @@ export class Entity
     public gocTransform?: ComponentTransform
     public gocBag?: ComponentBag
 
-    protected readonly guid: number
+    public readonly guid: number
     protected tags: Set<EntityTag> = new Set()
 
     public constructor(guid: number, tags: EntityTag[] = [])
@@ -30,11 +30,6 @@ export class Entity
             }
         }
         return true
-    }
-
-    public getGUID()
-    {
-        return this.guid
     }
 }
 

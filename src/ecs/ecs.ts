@@ -49,12 +49,12 @@ export class ECS
 
     public addEntity(this: this, entity: Entity)
     {
-        this.entities.set(entity.getGUID(), entity)
+        this.entities.set(entity.guid, entity)
         for (let view of this.tickEntityViews)
         {
             if (isEntityInView(entity, view.components) && entity.hasAllTags(view.tags))
             {
-                view.entities.set(entity.getGUID(), entity)
+                view.entities.set(entity.guid, entity)
             }
         }
     }

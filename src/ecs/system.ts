@@ -33,7 +33,7 @@ export class BagSystem extends System
 
     private onAddItem(this: this, entity: EntityView<typeof BagSystem.components[number]>, item: Entity)
     {
-        console.log(`BagSystem onAddItem, item=${item.getGUID()}, entity=${entity.getGUID()}`)
+        console.log(`BagSystem onAddItem, item=${item.guid}, entity=${entity.guid}`)
     }
 }
 
@@ -60,7 +60,7 @@ export class MovementSystem extends System
 
     public tickEntity(this: this, deltaTime: number, entity: EntityView<typeof MovementSystem.components[number]>)
     {
-        console.log(`MovementSystem tickEntity, deltaTime=${deltaTime}, entity=${entity.getGUID()}`)
+        console.log(`MovementSystem tickEntity, deltaTime=${deltaTime}, entity=${entity.guid}`)
     }
 
     private onGameplayStart(this: this)
@@ -75,6 +75,6 @@ export class MovementSystem extends System
 
     private onMoveStop(this: this, entity: EntityView<typeof MovementSystem.components[number]>, isImme: boolean)
     {
-        console.log(`MovementSystem onMoveStop, isImme=${isImme}, entity=${entity.getGUID()}`)
+        console.log(`MovementSystem onMoveStop, isImme=${isImme}, entity=${entity.guid}`)
     }
 }
