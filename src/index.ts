@@ -11,6 +11,9 @@ import "./try-entity"
 import "./test-ecs-events"
 import "./test-ecs"
 
+import './hotfix-function'
+import './hotfix-class'
+
 console.log("done.")
 
 
