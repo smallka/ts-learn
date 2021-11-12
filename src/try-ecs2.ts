@@ -10,8 +10,6 @@ type SystemEvents = {
     onAddEntity: EntityInfo,
 }
 
-type SystemEventHandler<S=unknown, T = unknown> = (this: S, argument: T) => void;
-
 class BaseSystem
 {
     protected ecs: ECS
@@ -21,14 +19,18 @@ class BaseSystem
         this.ecs = ecs_
     }
 
-    protected registerEvent<K extends keyof SystemEvents>(this: this, event: K, func: SystemEventHandler<typeof this, SystemEvents[K]>)
-    {
-        ecs.on(event, func.bind(this))
+    protected registerEvent<K extends keyof SystemEvents>(event: K, func: EventHandler<SystemEvents[K]>)
+    {        
+        let funcName = func.name
+        ecs.on(event, (...args) => {
+            let realFunc: any = this[funcName as keyof typeof this]
+            realFunc.call(this, ...args) 
+        })
     }
 
-    protected registerEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
+    protected registerEntityEvent<K extends keyof EntityEvents>(event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
     {
-        ecs.onEntityEvent(event, tags, handler)        
+        ecs.onEntityEvent(event, tags, handler.bind(this))        
     }
 }
 
@@ -41,11 +43,11 @@ class PhysicsSystem extends BaseSystem
         this.registerEntityEvent('onDamage', 'player', this.onDamage)
     }
 
-    update(this: this, dt: number): void
+    update(dt: number): void
     {
         console.log(`${this.ecs.name} call physics: update ${dt}`)
     }
-    onDamage(this: this, entity: Entity, damage: number): void
+    onDamage(entity: Entity, damage: number): void
     {
         console.log(`on damage, entity=${entity.tags}, damage=${damage}`)
     }
@@ -62,12 +64,12 @@ class AOISystem extends BaseSystem
         this.registerEvent('onAddEntity', this.onAddEntity)
     }
 
-    update(this: this, dt: number): void
+    update(dt: number): void
     {
         console.log(`${this.ecs.name} call AOI: update ${dt} radius=${this.radius}`)
     }
 
-    onAddEntity(this: this, entity: EntityInfo): number
+    onAddEntity(entity: EntityInfo): number
     {
         console.log(`${this.ecs.name} call AOI: onAddEntity ${entity.name}`)
         return 2;
@@ -107,17 +109,17 @@ class ECS
         this.entityEmitter = createEvents<EntityEventsWrapper>()
     }
 
-    on<K extends keyof SystemEvents>(this: this, event: K, handler: EventHandler<SystemEvents[K]>)
+    on<K extends keyof SystemEvents>(event: K, handler: EventHandler<SystemEvents[K]>)
     {
         return this.systemEmitter.on(event, handler)
     }
 
-    emit<K extends keyof SystemEvents>(this: this, event: K, argument: SystemEvents[K]): void
+    emit<K extends keyof SystemEvents>(event: K, argument: SystemEvents[K]): void
     {
         this.systemEmitter.emit(event, argument)
     }
 
-    public onEntityEvent<K extends keyof EntityEvents>(this: this, event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
+    public onEntityEvent<K extends keyof EntityEvents>(event: K, tags: Tags[] | Set<Tags> | Tags | ((t:Set<Tags>)=>boolean), handler: EntityEventHandler<EntityEvents[K]>)
     {
         return this.entityEmitter.on(event, (argumentWrapper: EntityEventsWrapper[K]) => {
             let entity = argumentWrapper.entity
@@ -148,7 +150,7 @@ class ECS
         })
     }
 
-    public emitEntityEvent<K extends keyof EntityEvents>(this: this, event: K, entity: Entity, argument: EntityEvents[K]): void
+    public emitEntityEvent<K extends keyof EntityEvents>(event: K, entity: Entity, argument: EntityEvents[K]): void
     {
         // 这个as是安全的，但是去不掉
         let argumentWrapper: EntityEventsWrapper[K] = { entity: entity, argument: argument } as EntityEventsWrapper[K]
@@ -162,8 +164,8 @@ new AOISystem(ecs, 2.5)
 
 ecs.emit('update', 101)
 
-let info: EntityInfo = {name: 'alice', typeId: 1001}
-ecs.emit('onAddEntity', info)
+let alice: EntityInfo = {name: 'alice', typeId: 1001}
+ecs.emit('onAddEntity', alice)
 
 let entSam = new Entity(['player'])
 ecs.emitEntityEvent('onDamage', entSam, 102)
@@ -171,4 +173,16 @@ ecs.emitEntityEvent('onDamage', entSam, 102)
 let entDog = new Entity(['npc'])
 ecs.emitEntityEvent('onDamage', entDog, 103)
 
-ecs.emitEntityEvent('onDie', entDog, info)
+ecs.emitEntityEvent('onDie', entDog, alice)
+
+console.log('----------- try-hotfix')
+function onAddEntity(this: AOISystem, entity: EntityInfo): number
+{
+    console.log(`${this.ecs.name} call AOI: onAddEntity2 ${entity.name}`)
+    return 0
+}
+AOISystem.prototype.onAddEntity = onAddEntity
+
+let bob: EntityInfo = {name: 'bob', typeId: 1002}
+ecs.emit('onAddEntity', bob)
+
