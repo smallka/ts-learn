@@ -1,5 +1,5 @@
 export {}
-console.log('------------------ learn-ecs ------------------')
+console.log('------------------ try-ecs ------------------')
 
 import {createEvents, Emitter} from './events';
 

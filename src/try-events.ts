@@ -1,5 +1,5 @@
 export {}
-console.log("------------------ learn-events ------------------")
+console.log("------------------ try-events ------------------")
 
 import {createEvents} from "./events";
 
