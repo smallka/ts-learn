@@ -1,5 +1,5 @@
 export {}
-console.log('------------------ learn-entity ------------------')
+console.log('------------------ try-entity ------------------')
 
 class ComponentHead { 
     name: string = 'head'
