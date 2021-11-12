@@ -14,6 +14,8 @@ import "./test-ecs"
 import './hotfix-function'
 import './hotfix-class'
 
+import './try-decorator'
+
 console.log("done.")
 
 
