@@ -6,6 +6,7 @@ import "./learn-mitt"
 import "./try-events"
 import "./try-ecs"
 import "./try-ecs2"
+
 import "./try-entity"
 
 import "./test-ecs-events"
@@ -13,8 +14,6 @@ import "./test-ecs"
 
 import './hotfix-function'
 import './hotfix-class'
-
-import './try-decorator'
 
 console.log("done.")
 

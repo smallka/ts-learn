@@ -128,11 +128,3 @@ B.prototype.mul = mul2
 
 b.mul(5)
 console.log(b.val)
-
-console.log(A.prototype)
-console.log(Object.getOwnPropertyNames(A.prototype))
-for (let key of Object.getOwnPropertyNames(A.prototype))
-{
-    console.log(key)
-    console.log((<any>(A.prototype))[key])
-}
