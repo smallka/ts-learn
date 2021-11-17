@@ -14,9 +14,9 @@ class TimerManager
         return this.currentIdx;
     }
 
-    public delete(handler : TimerHandler | Array<TimerHandler>)
+    public delete(handler : TimerHandler | Set<TimerHandler>)
     {
-        if (handler instanceof Array)
+        if (handler instanceof Set)
         {
             handler.forEach(element => {
                 this.timerMap.delete(element);
