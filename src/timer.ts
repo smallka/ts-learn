@@ -4,6 +4,7 @@ export {}
 console.log('------------------ entity-base ------------------')
 
 type TimerHandler = number
+let EmptyTimerHandler = -1;
 
 class TimerRecord
 {
@@ -16,13 +17,12 @@ class TimerManager
 {
     // TODO 真正的Timer逻辑还没写呢
 
-    public delayOnce(ms : number, base : TimerBase) : TimerHandler // TODO 这里还要再记录一个entity？才能够清理对应的handler？
+    public delayOnce(ms : number, base : TimerBase) : TimerHandler
     {
         this.currentIdx += 1
         this.timerMap.set(this.currentIdx, base)
         return this.currentIdx;
     }
-
 
     public delete(handler : TimerHandler | HandlersMap)
     {
@@ -55,28 +55,20 @@ class TimerBase
 {
     public delayOnce(ms : number, callback : Function) : TimerHandler
     {
-        let foundFunctionName : undefined | string = undefined;
+        let funcName = callback.name;
 
         let ClassPrototype = Object.getPrototypeOf(this);
-        Object.getOwnPropertyNames(ClassPrototype).forEach(name => {
-            if (ClassPrototype[name] === callback)
-            {
-                console.log("Found match " + name);
-                foundFunctionName = name;
-            }
-        });
-
-        if (!foundFunctionName)
+        if (ClassPrototype[funcName] !== callback)
         {
-            throw new Error('Callback should be class function');
+            throw new Error("Callback is not class Prototype");    
         }
 
         let handler = TimerManagerInstance.delayOnce(ms, this);
-        this.handlers.set(handler, new CallbackRecords(foundFunctionName));
+        this.handlers.set(handler, new CallbackRecords(funcName));
         return handler;
     }
 
-    public onCallback(handler : TimerHandler) // TODO 如果调用了这个函数，是不是timer就记在自己这里更好？
+    public onCallback(handler : TimerHandler)
     {
         let record = this.handlers.get(handler)
         if (record)
