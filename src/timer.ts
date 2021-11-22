@@ -1,25 +1,35 @@
+import { Handler } from "mitt"
+
 export {}
 console.log('------------------ entity-base ------------------')
 
 type TimerHandler = number
 
+class TimerRecord
+{
+    
+}
+
+type HandlersMap = Map<TimerHandler, CallbackRecords>;
+
 class TimerManager
 {
     // TODO 真正的Timer逻辑还没写呢
 
-    public delayOnce(ms : number, callback : Function) : TimerHandler // TODO 这里还要再记录一个entity？才能够清理对应的handler？
+    public delayOnce(ms : number, base : TimerBase) : TimerHandler // TODO 这里还要再记录一个entity？才能够清理对应的handler？
     {
         this.currentIdx += 1
-        this.timerMap.set(this.currentIdx, callback)
+        this.timerMap.set(this.currentIdx, base)
         return this.currentIdx;
     }
 
-    public delete(handler : TimerHandler | Set<TimerHandler>)
+
+    public delete(handler : TimerHandler | HandlersMap)
     {
-        if (handler instanceof Set)
+        if (handler instanceof Map)
         {
-            handler.forEach(element => {
-                this.timerMap.delete(element);
+            handler.forEach((records, handler) => {
+                this.timerMap.delete(handler);
             });
         }
         else
@@ -28,15 +38,74 @@ class TimerManager
         }
     }
 
-    private timerMap = new Map<number, Function>();
+    private timerMap = new Map<number, TimerBase>();
     private currentIdx = 0;
 }
 
 let TimerManagerInstance = new TimerManager();
 
+class CallbackRecords
+{
+    constructor(public func : string, public once = true)
+    {    
+    }
+}
+
 class TimerBase
 {
-    public delayOnceLearn(ms : number, callback : Function)
+    public delayOnce(ms : number, callback : Function) : TimerHandler
+    {
+        let foundFunctionName : undefined | string = undefined;
+
+        let ClassPrototype = Object.getPrototypeOf(this);
+        Object.getOwnPropertyNames(ClassPrototype).forEach(name => {
+            if (ClassPrototype[name] === callback)
+            {
+                console.log("Found match " + name);
+                foundFunctionName = name;
+            }
+        });
+
+        if (!foundFunctionName)
+        {
+            throw new Error('Callback should be class function');
+        }
+
+        let handler = TimerManagerInstance.delayOnce(ms, this);
+        this.handlers.set(handler, new CallbackRecords(foundFunctionName));
+        return handler;
+    }
+
+    public onCallback(handler : TimerHandler) // TODO 如果调用了这个函数，是不是timer就记在自己这里更好？
+    {
+        let record = this.handlers.get(handler)
+        if (record)
+        {
+            let f = this[record.func as keyof typeof this]
+            if (f instanceof Function)
+            {
+                f();
+            }
+            else
+            {
+                throw new Error("Callback with no function")
+            }
+
+            if (record.once)
+            {
+                this.handlers.delete(handler)
+            }
+        }
+    }
+
+    public clearAllTimer()
+    {
+        TimerManagerInstance.delete(this.handlers);
+    }
+
+    // ----------------------------------------------------------------------------
+    // Test func
+    public delayOnce_TEST(ms : number, callback : Function)
     {
         let foundCallback = false;
         let ClassPrototype = Object.getPrototypeOf(this);
@@ -53,32 +122,10 @@ class TimerBase
             console.log("Match not found " + callback);
         }
     }
+    // ----------------------------------------------------------------------------
 
-    public delayOnce(ms : number, callback : Function) : TimerHandler
-    {
-        let foundCallback = false;
 
-        if (!foundCallback)
-        {
-            throw new Error('Callback should be class function');
-        }
-
-        let handler = TimerManagerInstance.delayOnce(ms, Function);
-        this.handlers.add(handler);
-        return handler;
-    }
-
-    public onCallback(handler : number) // TODO 如果调用了这个函数，是不是timer就记在自己这里更好？
-    {
-        this.handlers.delete(handler)
-    }
-
-    public clearAllTimer()
-    {
-        TimerManagerInstance.delete(this.handlers);
-    }
-
-    private handlers = new Set<number>();
+    private handlers = new Map<TimerHandler, CallbackRecords>();
 }
 
 class Entity extends TimerBase {
@@ -147,7 +194,7 @@ console.log(Object.getOwnPropertyNames(Object.getPrototypeOf(e)))
 console.log(Object.getOwnPropertyDescriptors(Object.getPrototypeOf(e)))
 
 // Found match test
-e.delayOnceLearn(100, e.test)
+e.delayOnce_TEST(100, e.test)
 
 // Match not found function () { }
-e.delayOnceLearn(100, ()=>{})
+e.delayOnce_TEST(100, ()=>{})
